@@ -29,11 +29,11 @@ if not os.path.exists(GIT_PATH)
 	os.makedirs(GIT_PATH)
 	
 def is_git_repo(path):
-    try:
-        _ = git.Repo(path).git_dir
-        return True
-    except git.exc.InvalidGitRepositoryError:
-        return False
+	try:
+		_ = git.Repo(path).git_dir
+		return True
+	except git.exc.InvalidGitRepositoryError:
+		return False
 
 def start_git():
 	if is_git_repo(GIT_PATH):	
