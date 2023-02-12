@@ -36,8 +36,10 @@ async def on_message(message):
 			discord_embed.add_field(name="!help", value="shows command list", inline=False)
 			discord_embed.add_field(name="!list", value="displays a list of domains and subdomains you have registered", inline=False)
 			discord_embed.add_field(name="!set <domain name> <ip address>", value="registers an ip address to a domain/subdomain", inline=False)
+			discord_embed.add_field(name="!neocities <domain name> <neo cities site>", value="points the domain to a site hosted on neocities", inline=False)
 			discord_embed.add_field(name="!check <domain name>", value="checks if domain is registered or not", inline=False)
 			await message.author.send(embed = discord_embed)
+			
 		if len(arg_list) > 1 and arg_list[0] == "!check":
 			if not find_entry(arg_list[1]):
 				if formatted_domain := format_domain(arg_list[1]):
@@ -49,16 +51,18 @@ async def on_message(message):
 					await error_message(message.author, 'Domain Check Failed', ':x: Invalid domain format. :x: Try an example: ucanet.net')
 			else:
 				await error_message(message.author, ':x: Domain Taken.', ':lock: This domain is registered! :lock: Try using a different suffix (.co, .net, .org).')
+				
 		if len(arg_list) > 0 and arg_list[0] == "!list":
 			domain_list = user_domains(message.author.id)
 			if len(domain_list) > 0:
 				discord_embed = discord.Embed(title="Domain List", description="The following is a list of your registered domains:", color=0x109319)
 				domain_count = 0
-				for domain_name, current_ip in domain_list.items():
-					if current_ip == "0.0.0.0":
+				for domain_name, current_ip in domain_list.items():		
+					current_label = "IP Address" if format_ip(current_ip) else "Neocities Site"
+					if format_ip(current_ip) and current_ip == "0.0.0.0":
 						current_ip = "(Not set)"
 					domain_count += 1
-					discord_embed.add_field(name=f'{domain_count}. {domain_name}', value=f'IP Address: {current_ip}', inline=False)
+					discord_embed.add_field(name=f'{domain_count}. {domain_name}', value=f'{current_label}: {current_ip}', inline=False)
 
 				await message.author.send(embed = discord_embed)
 			else:
@@ -85,6 +89,30 @@ async def on_message(message):
 					await error_message(message.author, 'IP Set Failed', ":x: This domain does not exist. :x:\nType `!list` for a list of your registered domains/subdomains.")
 			else:
 				await error_message(message.author, 'IP Set Failed', ':x: Invalid domain format. :x:')				
+
+		if len(arg_list) > 2 and arg_list[0] == "!neocities":
+			if formatted_domain := format_domain(arg_list[1]):
+				if find_entry(formatted_domain):
+					domain_list = user_domains(message.author.id)
+					if formatted_domain not in domain_list.keys():
+						if second_level(formatted_domain) and second_level(formatted_domain) in domain_list.keys():
+							pass
+						else:
+							await error_message(message.author, 'Neocities Set Failed', ":x: This domain is not registered to your account. :x:\nType `!list` for a list of your registered domains/subdomains.")
+							return
+					formatted_neo = format_domain(arg_list[2] + ".com")
+					if formatted_neo and not second_level(formatted_neo):
+						if register_ip(formatted_domain, message.author.id, arg_list[2].lower()):
+							await success_message(message.author, 'Neocities Set Success', f':white_check_mark: You have successfully pointed `{formatted_domain}` to a Neocities site :white_check_mark:' + "\nYou can revert this using the `!set <domain name> none` command.")
+						else:
+							await error_message(message.author, 'Neocities Set Failed', ':x: You have reached the domain/subdomain limit of 20! :x:')
+					else:
+						await error_message(message.author, 'Neocities Set Failed', ':x: Invalid Neocities format. :x:')		
+				else:
+					await error_message(message.author, 'Neocities Set Failed', ":x: This domain does not exist. :x:\nType `!list` for a list of your registered domains/subdomains.")
+			else:
+				await error_message(message.author, 'Neocities Set Failed', ':x: Invalid domain format. :x:')				
+				
 		return
 		
 	if message.guild.id == GUILD_ID and message.channel.id == CHANNEL_ID:
@@ -103,6 +131,7 @@ async def on_message(message):
 					await error_message(message.author, 'Registration Failed.', ':x: Invalid domain format. :x: Try again later.')
 			else:
 				await error_message(message.author, 'Registration Failed.', ":x: This domain already exists.\n\n:x: Use `!check <domain name>` in this private channel to check the ownership of a domain.")
+		
 		return
 
 client.run(DISCORD_TOKEN)
