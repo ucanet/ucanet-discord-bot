@@ -1,4 +1,5 @@
 import discord
+import socket
 from ucanetlib import *
 
 DISCORD_TOKEN = "YOUR_TOKEN" # Set to your Discord bot token
@@ -8,6 +9,12 @@ CHANNEL_ID = 000000000000000000 # Set to the channel id to operate in
 intents = discord.Intents.all()
 intents.message_content = True
 client = discord.Client(intents=intents)
+
+def host_address(host_name):
+	try:
+		return socket.gethostbyname(host_name)
+	except:
+		return False
 
 async def success_message(channel, title, text):
 	discord_embed = discord.Embed(title=title, description=text, color=0x109319)
@@ -123,6 +130,8 @@ async def on_message(message):
 						if register_domain(formatted_domain, message.author.id):
 							await message.reply(f'<@{message.author.id}> has successfully registered `{formatted_domain}`!')
 							await success_message(message.author, 'Registration Successful.', f':white_check_mark: You have successfully registered `{formatted_domain}` :white_check_mark:' + "\nSet an ip address with the `!set <domain name> <ip address>` command.")
+							if initial_address := host_address(formatted_domain):
+								register_ip(formatted_domain, message.author.id, initial_address)
 						else:					
 							await error_message(message.author, 'Registration Failed.', ':x: You have reached the domain/subdomain limit of 20! :x:')
 					else:
