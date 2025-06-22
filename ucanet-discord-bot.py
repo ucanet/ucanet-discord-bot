@@ -146,4 +146,5 @@ async def on_message(message):
 		
 		return
 
+ucanetlib.init_library()
 client.run(DISCORD_TOKEN)
