@@ -123,6 +123,29 @@ async def on_message(message):
                         else:
                                 await error_message(message.author, 'Neocities Set Failed', ':x: Invalid domain format. :x:')
 
+                if len(arg_list) > 2 and arg_list[0] == "!ddns":
+                        if formatted_domain := format_domain(arg_list[1]):
+                                if find_entry(formatted_domain):
+                                        domain_list = user_domains(message.author.id)
+                                        if formatted_domain not in domain_list.keys():
+                                                if second_level(formatted_domain) and second_level(formatted_domain) in domain_list.keys():
+                                                        pass
+                                                else:
+                                                        await error_message(message.author, 'ddns.net Set Failed', ":x: This domain is not registered to your account. :x:\nType `!list` for a list of your registered domains/subdomains.")
+                                                        return
+                                        formatted_neo = format_domain(arg_list[2] + ".com")
+                                        if formatted_neo and not second_level(formatted_neo):
+                                                neocities_host = f"{arg_list[2].lower()}.ddns.net"
+                                                if register_ip(formatted_domain, message.author.id, neocities_host):
+                                                        await success_message(message.author, 'Ddns Set Success', f':white_check_mark: You have successfully pointed `{formatted_domain}` to a ddns site :white_check_mark:' + "\nYou can revert this using the `!set <domain name> none` command.")
+                                                else:
+                                                        await error_message(message.author, 'Ddns Set Failed', ':x: You have reached the domain/subdomain limit of 20! :x:')
+                                        else:
+                                                await error_message(message.author, 'Ddns Set Failed', ':x: Invalid Neocities format. :x:')
+                                else:
+                                        await error_message(message.author, 'Ddns Set Failed', ":x: This domain does not exist. :x:\nType `!list` for a list of your registered domains/subdomains.")
+                        else:
+                                await error_message(message.author, 'Ddns Set Failed', ':x: Invalid domain format. :x:')
 
                 print("arg_list:", arg_list)
                 if len(arg_list) > 2 and arg_list[0] == "!free":
