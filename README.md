@@ -14,6 +14,7 @@ Command                                    | Context          | Description
 !list                                      | DMs              | Displays a list of domains and subdomains you have registered.
 !set {domain name} {ip address}            | DMs              | Registers an ip address to a domain/subdomain.
 !neocities {domain name} {neo cities site} | DMs              | Points the domain to a site hosted on Neocities.
+!ddns {domain name} {ddns.net domain name} | DMs              | Points the domain to a self-hosted site with a ddns.net domain name.
 !free {domain name} {freesites site}       | DMs              | Points the domain to a site hosted on Freesites.
 !check {domain name}                       | DMs              | Checks if domain is registered or not.
 
